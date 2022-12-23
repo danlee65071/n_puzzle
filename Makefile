@@ -23,7 +23,8 @@ OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 OBJS_PATH = $(addprefix $(OBJS_DIR)/, $(OBJS))
 
 # headers
-HEADERS = 
+HEADERS = AStar.hpp \
+		  Point.hpp
 HEADERS_PATH = $(addprefix $(HEADERS_DIR)/, $(HEADERS))
 
 # compiler

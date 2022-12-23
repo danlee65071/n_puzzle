@@ -1,7 +1,11 @@
 #pragma once
 
+#include "Point.hpp"
+#include "cmath"
+
 class AStar
 {
+    // Singleton design
     private:
         AStar() {}
 
@@ -14,4 +18,7 @@ class AStar
         }
         AStar(const AStar&) = delete;
         void operator=(const AStar&) = delete;
+
+        // Metrics
+        float manhattan_metric(Point p, Point goal);
 };
