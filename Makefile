@@ -11,7 +11,7 @@ SRCS = main.cpp
 SRCS_PATH = $(addprefix $(SRCS_DIR)/, $(SRCS))
 
 # objs
-OBJS = $(patsubst %.o, %.cpp, $(SRCS))
+OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 OBJS_PATH = $(addprefix $(OBJS_DIR)/, $(OBJS))
 
 # headers
@@ -19,7 +19,7 @@ HEADERS =
 HEADERS_PATH = $(addprefix $(HEADERS_DIR)/, $(HEADERS))
 
 # compiler
-CC = clang++
+CC = g++
 
 # flags
 FLAGS = -Wall -Werror -Wextra -g -O3 -std=c++17
