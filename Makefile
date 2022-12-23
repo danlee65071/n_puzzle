@@ -8,6 +8,14 @@ HEADERS_DIR = includes
 
 # srcs
 SRCS = main.cpp
+
+# A-star
+ASTAR_DIR = AStar
+DIRS = $(addprefix $(OBJS_DIR)/, $(ASTAR_DIR))
+ASTAR_SRCS = AStar.cpp
+ASTAR_SRCS_PATH = $(addprefix $(ASTAR_DIR)/, $(ASTAR_SRCS))
+SRCS += $(ASTAR_SRCS_PATH)
+
 SRCS_PATH = $(addprefix $(SRCS_DIR)/, $(SRCS))
 
 # objs
@@ -32,11 +40,11 @@ all: $(NAME)
 
 $(NAME): create_dirs $(OBJS_PATH)
 	@echo "$(GREEN)\nObjects was created $(RESET)"
-	@$(CC) $(FLAGS) -I $(HEADERS_DIR) -o $^
+	@$(CC) $(FLAGS) -I $(HEADERS_DIR) -o $@ $(OBJS_PATH)
 	@echo "$(GREEN)N-puzzle was compiled $(RESET)"
 
 create_dirs:
-	@mkdir -p $(OBJS_DIR)
+	@mkdir -p $(OBJS_DIR) $(DIRS)
 
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp $(HEADERS_PATH) Makefile
 	@$(CC) $(FLAGS) -I $(HEADERS_DIR) -c $< -o $@
