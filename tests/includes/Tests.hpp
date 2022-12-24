@@ -1,11 +1,9 @@
 #pragma once
 
 #include "AStar.hpp"
+#include "AStarTests/TestManhattanMetric.hpp"
 #include "cassert"
 #include "iostream"
-
-
-AStar& g_algo = AStar::getInstance();
 
 
 class Tests

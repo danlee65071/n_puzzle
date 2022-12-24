@@ -2,6 +2,6 @@
 
 typedef struct t_point
 {
-    float x;
-    float y;
+    double x;
+    double y;
 } Point;

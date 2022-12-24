@@ -20,5 +20,5 @@ class AStar
         void operator=(const AStar&) = delete;
 
         // Metrics
-        float manhattan_metric(Point p, Point goal);
+        static double manhattan_metric(Point p, Point goal);
 };

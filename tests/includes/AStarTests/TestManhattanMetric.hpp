@@ -1,8 +1,8 @@
 #pragma once
 
-#include "AStarTests.hpp"
+#include "../Tests.hpp"
 
-class TestManhattanMetric: public AStarTests
+class TestManhattanMetric: public Tests
 {
     // check manhattan metric
     private:
