@@ -16,6 +16,13 @@ ASTAR_SRCS = AStar.cpp
 ASTAR_SRCS_PATH = $(addprefix $(ASTAR_DIR)/, $(ASTAR_SRCS))
 SRCS += $(ASTAR_SRCS_PATH)
 
+# Parser
+PARSER_DIR = Parser
+DIRS += $(addprefix $(OBJS_DIR)/, $(PARSER_DIR))
+PARSER_SRCS = Parser.cpp
+PARSER_SRCS_PATH = $(addprefix $(PARSER_DIR)/, $(PARSER_SRCS))
+SRCS += $(PARSER_SRCS_PATH)
+
 SRCS_PATH = $(addprefix $(SRCS_DIR)/, $(SRCS))
 
 # objs

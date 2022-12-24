@@ -18,7 +18,7 @@ class AStar
         }
         AStar(const AStar&) = delete;
         void operator=(const AStar&) = delete;
-
+        ~AStar() {}
         // Metrics
         static double manhattan_metric(Point p, Point goal);
 };

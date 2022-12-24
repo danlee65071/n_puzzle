@@ -1,7 +1,9 @@
 #include <iostream>
+#include "Parser.hpp"
 
 int main()
 {
-    std::cout << "Hello!" << std::endl;
+    Parser p("maps/1.txt");
+
     return 0;
 }
