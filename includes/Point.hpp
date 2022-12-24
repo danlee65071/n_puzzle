@@ -4,5 +4,5 @@ typedef struct t_point
 {
     double x;
     double y;
-    int number;
+    int value;
 } Point;
