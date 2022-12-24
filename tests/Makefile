@@ -3,8 +3,7 @@ NAME = test
 HEADERS_DIR = ../includes
 
 PROJECT_OBJS_DIR = ../objs
-PROJECT_OBJS_ = $(shell find $(PROJECT_OBJS_DIR) -name '*.o')
-PROJECT_OBJS = $(filter-out ../objs/main.o, $(PROJECT_OBJS_))
+
 OBJS_DIR = objs
 
 SRCS = test.cpp
@@ -28,7 +27,13 @@ FLAGS = -Wall -Werror -Wextra -g -O3 -std=c++17
 
 all: $(NAME)
 
-$(NAME): create_dirs $(OBJS_PATH)
+make_project:
+	@make -C ..
+
+PROJECT_OBJS_ = $(shell find $(PROJECT_OBJS_DIR) -name '*.o')
+PROJECT_OBJS = $(filter-out ../objs/main.o, $(PROJECT_OBJS_))
+
+$(NAME): make_project create_dirs $(OBJS_PATH)
 	@make -C ..
 	@$(CC) $(FLAGS) -I $(HEADERS_DIR) -I $(HEADERS_TESTS_ROOT_DIR) -o $@ $(OBJS_PATH) $(PROJECT_OBJS)
 
