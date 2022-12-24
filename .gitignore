@@ -1,2 +1,5 @@
 maps
 objs
+n_puzzle
+tests/objs
+tests/test
