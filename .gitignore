@@ -4,3 +4,4 @@ n_puzzle
 tests/objs
 tests/test
 .vscode
+.idea

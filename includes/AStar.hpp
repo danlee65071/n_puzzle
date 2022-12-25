@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 #include "Point.hpp"
 #include "cmath"
 
@@ -12,10 +13,10 @@ class AStar
         double (*_Heuristics)(Point p1, Point p2);
     // Singleton design
     private:
-        AStar(int n, int** data, std::string heuristics="manhattan");
+        AStar(int n, int** data, std::string heuristics);
 
     public:
-        static AStar& getInstance(int n, int** data, std::string heuristics)
+        static AStar& getInstance(int n, int** data, std::string heuristics="manhattan")
         {
             static AStar instance(n, data, heuristics);
 
@@ -31,5 +32,6 @@ class AStar
 
     // Algorithm
     public:
+        bool check_data() const;
         void run_algo();
 };
