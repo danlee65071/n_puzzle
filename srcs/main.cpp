@@ -4,11 +4,10 @@
 
 int main()
 {
-    Parser p1("maps/3.txt");
-    Parser p2("maps/2.txt");
+    Parser p1("maps/1.txt");
 
     AStar& a = AStar::GetInstance(p1.getN(), p1.getData());
-    std::cout << a.CheckData() << std::endl;
-//    a.RunAlgo();
+//    std::cout << a.CheckData() << std::endl;
+    a.RunAlgo();
     return 0;
 }

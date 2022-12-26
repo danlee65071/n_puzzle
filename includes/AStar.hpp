@@ -3,6 +3,8 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <limits>
+#include <cstring>
 #include "Point.hpp"
 #include "cmath"
 
@@ -11,8 +13,8 @@ class AStar
     private:
         int _N;
         int** _Data;
-        double (*_Heuristics)(Point p1, Point p2);
-        Point _EmptyPos = {0, 0, 0};
+        int (*_Heuristics)(Point p1, Point p2);
+        Point _EmptyPos = {-1, -1, 0};
         Point* _NumPos;
 
     // Singleton design
@@ -32,14 +34,15 @@ class AStar
 
     // Metrics
     public:
-        static double ManhattanMetric(Point p, Point goal);
+        static int ManhattanMetric(Point p, Point goal);
 
     // Algorithm
     public:
         bool CheckData() const;
         void RunAlgo();
         void ShiftData();
-        bool CopyData(int**& Array, int swap_id, bool is_done=true);
-//        int GetMatrixHeuristic(int** Array);
+        bool CopyData(int*** Array, int swap_id, bool is_done=true);
+        int GetMatrixHeuristic(int** Array);
+        int GetLinearConflicts(int** Array);
 };
 
