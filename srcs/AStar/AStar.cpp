@@ -63,7 +63,7 @@ AStar::AStar(int n, int** data, const std::string& heuristic): _N(n), _Data(data
                 is_reverse = true;
             }
         }
-        else if (is_vertical && is_reverse)
+        else if (is_vertical)
         {
             if (j > j_min)
                 j--;
@@ -74,12 +74,10 @@ AStar::AStar(int n, int** data, const std::string& heuristic): _N(n), _Data(data
                 is_vertical = false;
             }
         }
-        else if (!is_vertical && is_reverse)
-        {
+        else {
             if (i > i_min)
                 i--;
-            else
-            {
+            else {
                 j++;
                 j_min++;
                 is_vertical = true;
@@ -93,10 +91,6 @@ AStar::AStar(int n, int** data, const std::string& heuristic): _N(n), _Data(data
 
 int AStar::ManhattanMetric(Point p, Point goal)
 {
-//    std::cout << goal.x << ' ' <<  goal.y << std::endl;
-//    std::cout << p.x << ' ' << p.y << std::endl;
-//    std::cout << abs(p.x - goal.x) << std::endl;
-//    std::cout << abs(p.y - goal.y) << std::endl;
     return abs(p.x - goal.x) + abs(p.y - goal.y);
 }
 
@@ -140,7 +134,7 @@ bool AStar::CheckData() const
                 is_reverse = true;
             }
         }
-        else if (is_vertical && is_reverse)
+        else if (is_vertical)
         {
             if (j > j_min)
                 j--;
@@ -151,12 +145,10 @@ bool AStar::CheckData() const
                 is_vertical = false;
             }
         }
-        else if (!is_vertical && is_reverse)
-        {
+        else {
             if (i > i_min)
                 i--;
-            else
-            {
+            else {
                 j++;
                 j_min++;
                 is_vertical = true;
@@ -169,28 +161,17 @@ bool AStar::CheckData() const
     return true;
 }
 
-void AStar::ShiftData()
-{
-
-}
-
 bool AStar::CopyData(int*** Array, int swap_id, bool is_done)
 {
-//    std::copy(&this->_Data[0][0], &this->_Data[0][0] + this->_N * this->_N, &(*Array)[0][0]);
-//    memcpy(*Array, this->_Data, this->_N * this->_N * sizeof(int));
     for (int i = 0; i < this->_N; i++)
         for (int j = 0; j < this->_N; j++)
             (*Array)[i][j] = this->_Data[i][j];
-//    std::cout << **Array << ' ' << *(this->_Data) << std::endl;
     switch (swap_id)
     {
         case 0: {
             if (this->_EmptyPos.y > 0) {
-                std::cout << this->_EmptyPos.y << std::endl;
                 std::swap((*Array)[this->_EmptyPos.y][this->_EmptyPos.x],
                           (*Array)[this->_EmptyPos.y - 1][this->_EmptyPos.x]);
-//                this->_EmptyPos.y--;
-//                std::cout << this->_EmptyPos.y << std::endl;
             }
             else
                 is_done = false;
@@ -200,7 +181,6 @@ bool AStar::CopyData(int*** Array, int swap_id, bool is_done)
             if (this->_EmptyPos.y < this->_N - 1) {
                 std::swap((*Array)[this->_EmptyPos.y][this->_EmptyPos.x],
                           (*Array)[this->_EmptyPos.y + 1][this->_EmptyPos.x]);
-//                (this->_EmptyPos.y)++;
             }
             else
                 is_done = false;
@@ -210,7 +190,6 @@ bool AStar::CopyData(int*** Array, int swap_id, bool is_done)
             if (this->_EmptyPos.x < this->_N - 1) {
                 std::swap((*Array)[this->_EmptyPos.y][this->_EmptyPos.x],
                           (*Array)[this->_EmptyPos.y][this->_EmptyPos.x + 1]);
-//                (this->_EmptyPos.x)++;
             }
             else
                 is_done = false;
@@ -220,22 +199,12 @@ bool AStar::CopyData(int*** Array, int swap_id, bool is_done)
             if (this->_EmptyPos.x > 0) {
                 std::swap((*Array)[this->_EmptyPos.y][this->_EmptyPos.x],
                           (*Array)[this->_EmptyPos.y][this->_EmptyPos.x - 1]);
-//                (this->_EmptyPos.x)--;
             }
             else
                 is_done = false;
             break;
         }
     }
-
-//    std::cout << std::endl;
-//    for (int i = 0; i < this->_N; i++)
-//    {
-//        for (int j = 0; j < this->_N; j++)
-//            std::cout << (*Array)[i][j] << ' ';
-//        std::cout << std::endl;
-//    }
-//    exit(0);
     return is_done;
 }
 
@@ -259,15 +228,6 @@ int AStar::GetLinearConflicts(int** Array)
         for (int cur_col = 0; cur_col < this->_N - 1; cur_col++)
             for (int i = cur_col + 1; i < this->_N; i++)
             {
-//                std::cout << "i: " << i << std::endl;
-//                std::cout << "j: " << j << std::endl;
-//                std::cout << "cur_col: " << cur_col << std::endl;
-//                std::cout << "Array[i][j]: " << Array[i][j] << std::endl;
-//                std::cout << "Array[cur_col][j]: " << Array[cur_col][j] << std::endl;
-//                std::cout << "this->_NumPos[Array[cur_col][j] - 1].x: " << this->_NumPos[Array[cur_col][j] - 1].x << std::endl;
-//                std::cout << "this->_NumPos[Array[cur_col][j] - 1].y: " << this->_NumPos[Array[cur_col][j] - 1].y << std::endl;
-//                std::cout << "this->_NumPos[Array[i][j] - 1].x: " << this->_NumPos[Array[i][j] - 1].x << std::endl;
-//                std::cout << "this->_NumPos[Array[i][j] - 1].y: " << this->_NumPos[Array[i][j] - 1].y << std::endl;
                 if (!Array[i][j] || !Array[cur_col][j])
                     continue;
                 if (this->_NumPos[Array[cur_col][j] - 1].x == this->_NumPos[Array[i][j] - 1].x \
@@ -285,21 +245,13 @@ int AStar::GetMatrixHeuristic(int **Array)
     {
         for (int j = 0; j < this->_N; j++)
         {
-//            std::cout << Array[i][j] << std::endl;
             if (!Array[i][j])
                 continue;
             Point p = {j, i, Array[i][j]};
-//            std::cout << "p.x: " << p.x << " p.y: " << p.y << " p.value: " << p.value << std::endl;
-//            std::cout << "this->_NumPos[Array[i][j] - 1].x: " << this->_NumPos[Array[i][j] - 1].x << " this->_NumPos[Array[i][j] - 1].y: " << this->_NumPos[Array[i][j] - 1].y \
-//                << " this->_NumPos[Array[i][j] - 1].value: " << this->_NumPos[Array[i][j] - 1].value << std::endl;
             res += this->_Heuristics(p, this->_NumPos[Array[i][j] - 1]);
-//            std::cout << res << std::endl;
-//            std::cout << AStar::GetLinearConflicts(Array) << std::endl;
         }
     }
     res += 2 * AStar::GetLinearConflicts(Array);
-//    std::cout << AStar::GetLinearConflicts(Array) << std::endl;
-//    std::cout << res << std::endl;
     return res;
 }
 
@@ -309,10 +261,9 @@ void AStar::RunAlgo()
     int** cpy2 = new int*[this->_N]; // down 1
     int** cpy3 = new int*[this->_N]; // right 2
     int** cpy4 = new int*[this->_N]; // left 3
+    int prev;
 
-    int prev, pprev;
-
-    prev = pprev = -1;
+    prev = -1;
 
     int g = 0;
 
@@ -323,13 +274,12 @@ void AStar::RunAlgo()
         cpy3[i] = new int[this->_N];
         cpy4[i] = new int[this->_N];
     }
-
-
-//    std::copy(&(this->_Data[0][0]), &(this->_Data[0][0]) + this->_N * this->_N, &cpy1[0][0]);
-//    std::copy(&(this->_Data[0][0]), &(this->_Data[0][0]) + this->_N * this->_N, &cpy2[0][0]);
-//    std::copy(&(this->_Data[0][0]), &(this->_Data[0][0]) + this->_N * this->_N, &cpy3[0][0]);
-//    std::copy(&(this->_Data[0][0]), &(this->_Data[0][0]) + this->_N * this->_N, &cpy4[0][0]);
-
+    for (int i = 0; i < this->_N; i++)
+    {
+        for (int j = 0; j < this->_N; j++)
+            std::cout << this->_Data[i][j] << ' ';
+        std::cout << std::endl;
+    }
     while (!this->CheckData())
     {
         bool is_cpy1 = this->CopyData(&cpy1, 0);
@@ -341,77 +291,59 @@ void AStar::RunAlgo()
 
         f[0] = f[1] = f[2] = f[3] = std::numeric_limits<int>::max();
 
-        std::cout << std::endl << is_cpy1 << ' ' << is_cpy2 << ' ' << is_cpy3 << ' ' << is_cpy4 << ' ' << std::endl;
-
-        if (is_cpy1 && prev != 1 && pprev != 0)
+        if (is_cpy1 && prev != 1)
             f[0] = g + this->GetMatrixHeuristic(cpy1);
-        if (is_cpy2 && prev != 0 && pprev != 1)
+        if (is_cpy2 && prev != 0)
             f[1] = g + this->GetMatrixHeuristic(cpy2);
-        if (is_cpy3 && prev != 3 && pprev != 2)
+        if (is_cpy3 && prev != 3)
             f[2] = g + this->GetMatrixHeuristic(cpy3);
-        if (is_cpy4 && prev != 2 && pprev != 3)
+        if (is_cpy4 && prev != 2)
             f[3] = g + this->GetMatrixHeuristic(cpy4);
-
-//        std::cout << std::endl;
-//        for (int i = 0; i < this->_N; i++)
-//        {
-//            for (int j = 0; j < this->_N; j++)
-//                std::cout << this->_Data[i][j] << ' ';
-//            std::cout << std::endl;
-//        }
 
         int min_val = f[0];
         int min_id = 0;
-        for (int i = 1; i < 4; i++)
-            if (f[i] < min_val)
-            {
+        for (int i = 1; i < 4; i++) {
+            if (f[i] < min_val) {
                 min_val = f[i];
                 min_id = i;
             }
-
-        for (int i = 0; i < 4; i++)
-            std::cout << f[i] << ' ';
-        std::cout << std::endl;
+        }
 
         switch (min_id) {
             case 0: {
-//                std::copy(&(cpy1[0][0]), &(cpy1[0][0]) + this->_N * this->_N, &this->_Data[0][0]);
                 for (int i = 0; i < this->_N; i++)
                     for (int j = 0; j < this->_N; j++)
                         this->_Data[i][j] = cpy1[i][j];
                 this->_EmptyPos.y--;
-                pprev = prev;
                 prev = 0;
+                std::cout << "up" << std::endl;
                 break;
             }
             case 1: {
-//                std::copy(&(cpy2[0][0]), &(cpy2[0][0]) + this->_N * this->_N, &this->_Data[0][0]);
                 for (int i = 0; i < this->_N; i++)
                     for (int j = 0; j < this->_N; j++)
                         this->_Data[i][j] = cpy2[i][j];
                 (this->_EmptyPos.y)++;
-                pprev = prev;
                 prev = 1;
+                std::cout << "down" << std::endl;
                 break;
             }
             case 2: {
-//                std::copy(&(cpy3[0][0]), &(cpy3[0][0]) + this->_N * this->_N, &this->_Data[0][0]);
                 for (int i = 0; i < this->_N; i++)
                     for (int j = 0; j < this->_N; j++)
                         this->_Data[i][j] = cpy3[i][j];
                 (this->_EmptyPos.x)++;
-                pprev = prev;
                 prev = 2;
+                std::cout << "right" << std::endl;
                 break;
             }
             case 3: {
-//                std::copy(&(cpy4[0][0]), &(cpy4[0][0]) + this->_N * this->_N, &this->_Data[0][0]);
                 for (int i = 0; i < this->_N; i++)
                     for (int j = 0; j < this->_N; j++)
                         this->_Data[i][j] = cpy4[i][j];
                 (this->_EmptyPos.x)--;
-                pprev = prev;
                 prev = 3;
+                std::cout << "left" << std::endl;
                 break;
             }
         }
@@ -422,14 +354,6 @@ void AStar::RunAlgo()
                 std::cout << this->_Data[i][j] << ' ';
             std::cout << std::endl;
         }
-        if (g == 16)
-            exit(0);
         g++;
-    }
-    for (int i = 0; i < this->_N; i++)
-    {
-        for (int j = 0; j < this->_N; j++)
-            std::cout << this->_Data[i][j] << ' ';
-        std::cout << std::endl;
     }
 }
