@@ -21,20 +21,28 @@ Parser::Parser(std::string Path): _MapPath(std::move(Path))
             std::stringstream ss(line);
             for (int j = 0; j < this->_N; j++)
             {
-                std::string num;
-                getline(ss, num, ' ');
-                this->_Data[i][j] = atoi(num.c_str());
+//                std::string num;
+//                getline(ss, num, ' ');
+//                std::cout << atoi(num.c_str()) << ' ';
+                int num;
+                ss >> num;
+//                std::cout << num << ' ';
+//                this->_Data[i][j] = atoi(num.c_str());
+                this->_Data[i][j] = num;
             }
+            std::cout << std::endl;
         }
     }
     file.close();
-    // std::cout << this->_N << std::endl;
-    // for (int i = 0; i < this->_N; i++)
-    // {
-    //     for (int j = 0; j < this->_N; j++)
-    //         std::cout << this->_Data[i][j] << ' ';
-    //     std::cout << std::endl;
-    // }
+//    std::cout << "parser" << std::endl;
+//    std::cout << this->_N << std::endl;
+//    for (int i = 0; i < this->_N; i++)
+//    {
+//        for (int j = 0; j < this->_N; j++)
+//            std::cout << this->_Data[i][j] << ' ';
+//        std::cout << std::endl;
+//    }
+//    std::cout << "parser" << std::endl;
 }
 
 Parser::~Parser()

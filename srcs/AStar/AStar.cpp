@@ -309,6 +309,10 @@ void AStar::RunAlgo()
             }
         }
 
+        for (int i : f)
+            std::cout << i << ' ';
+        std::cout << std::endl;
+
         switch (min_id) {
             case 0: {
                 for (int i = 0; i < this->_N; i++)
@@ -354,6 +358,8 @@ void AStar::RunAlgo()
                 std::cout << this->_Data[i][j] << ' ';
             std::cout << std::endl;
         }
+        if (g == 29)
+            exit(0);
         g++;
     }
 }

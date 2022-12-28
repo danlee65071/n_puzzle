@@ -16,6 +16,7 @@ class AStar
         int (*_Heuristics)(Point p1, Point p2);
         Point _EmptyPos = {-1, -1, 0};
         Point* _NumPos;
+        int*** _History;
 
     // Singleton design
     private:
