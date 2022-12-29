@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <limits>
 #include <cstring>
+#include <set>
 #include "Point.hpp"
 #include "cmath"
 
@@ -16,7 +17,7 @@ class AStar
         int (*_Heuristics)(Point p1, Point p2);
         Point _EmptyPos = {-1, -1, 0};
         Point* _NumPos;
-        int*** _History;
+        std::set<int**> _History;
 
     // Singleton design
     private:
@@ -45,5 +46,7 @@ class AStar
         bool CopyData(int*** Array, int swap_id, bool is_done=true);
         int GetMatrixHeuristic(int** Array);
         int GetLinearConflicts(int** Array);
+        int** GetCopy(int** Array);
+        bool CheckExistMatrixInHistory(int** Array);
 };
 

@@ -87,6 +87,19 @@ AStar::AStar(int n, int** data, const std::string& heuristic): _N(n), _Data(data
         k++;
         start_value++;
     }
+    this->_History.insert(this->GetCopy(this->_Data));
+}
+
+int** AStar::GetCopy(int **Array)
+{
+    int** cpy = new int*[this->_N];
+    for (int i = 0; i < this->_N; i++)
+    {
+        cpy[i] = new int[this->_N];
+        for (int j = 0; j < this->_N; j++)
+            cpy[i][j] = Array[i][j];
+    }
+    return cpy;
 }
 
 int AStar::ManhattanMetric(Point p, Point goal)
@@ -255,6 +268,31 @@ int AStar::GetMatrixHeuristic(int **Array)
     return res;
 }
 
+bool AStar::CheckExistMatrixInHistory(int **Array)
+{
+    bool flag = true;
+    for (auto it : this->_History) {
+        flag = true;
+        for (int i = 0; i < this->_N; i++) {
+            for (int j = 0; j < this->_N; j++) {
+//                std::cout << it[i][j] << ' ' << Array[i][j] << std::endl;
+                if (it[i][j] != Array[i][j]) {
+                    flag = false;
+                    break;
+                }
+            }
+            if (!flag)
+                break;
+        }
+        if (flag) {
+            std::cout << "1\n";
+            return true;
+        }
+    }
+    std::cout << "0\n";
+    return false;
+}
+
 void AStar::RunAlgo()
 {
     int** cpy1 = new int*[this->_N]; // up 0
@@ -290,14 +328,14 @@ void AStar::RunAlgo()
         int f[4];
 
         f[0] = f[1] = f[2] = f[3] = std::numeric_limits<int>::max();
-
-        if (is_cpy1 && prev != 1)
+        std::cout << is_cpy1 << ' ' << is_cpy2 << ' ' << is_cpy3 << ' ' << is_cpy4 << std::endl;
+        if (is_cpy1 && prev != 1 && !this->CheckExistMatrixInHistory(cpy1))
             f[0] = g + this->GetMatrixHeuristic(cpy1);
-        if (is_cpy2 && prev != 0)
+        if (is_cpy2 && prev != 0 && !this->CheckExistMatrixInHistory(cpy2))
             f[1] = g + this->GetMatrixHeuristic(cpy2);
-        if (is_cpy3 && prev != 3)
+        if (is_cpy3 && prev != 3 && !this->CheckExistMatrixInHistory(cpy3))
             f[2] = g + this->GetMatrixHeuristic(cpy3);
-        if (is_cpy4 && prev != 2)
+        if (is_cpy4 && prev != 2 && !this->CheckExistMatrixInHistory(cpy4))
             f[3] = g + this->GetMatrixHeuristic(cpy4);
 
         int min_val = f[0];
@@ -315,6 +353,7 @@ void AStar::RunAlgo()
 
         switch (min_id) {
             case 0: {
+//                this->_History.insert(cpy1);
                 for (int i = 0; i < this->_N; i++)
                     for (int j = 0; j < this->_N; j++)
                         this->_Data[i][j] = cpy1[i][j];
@@ -324,6 +363,7 @@ void AStar::RunAlgo()
                 break;
             }
             case 1: {
+//                this->_History.insert(cpy2);
                 for (int i = 0; i < this->_N; i++)
                     for (int j = 0; j < this->_N; j++)
                         this->_Data[i][j] = cpy2[i][j];
@@ -333,6 +373,7 @@ void AStar::RunAlgo()
                 break;
             }
             case 2: {
+//                this->_History.insert(cpy3);
                 for (int i = 0; i < this->_N; i++)
                     for (int j = 0; j < this->_N; j++)
                         this->_Data[i][j] = cpy3[i][j];
@@ -342,6 +383,7 @@ void AStar::RunAlgo()
                 break;
             }
             case 3: {
+//                this->_History.insert(cpy4);
                 for (int i = 0; i < this->_N; i++)
                     for (int j = 0; j < this->_N; j++)
                         this->_Data[i][j] = cpy4[i][j];
@@ -351,6 +393,9 @@ void AStar::RunAlgo()
                 break;
             }
         }
+
+        this->_History.insert(this->GetCopy(this->_Data));
+
         std::cout << std::endl;
         for (int i = 0; i < this->_N; i++)
         {
@@ -358,8 +403,23 @@ void AStar::RunAlgo()
                 std::cout << this->_Data[i][j] << ' ';
             std::cout << std::endl;
         }
-        if (g == 29)
-            exit(0);
+
+//        std::cout << "\nHistory start\n";
+//        for (auto it : this->_History)
+//        {
+//            for (int i = 0; i < this->_N; i++)
+//            {
+//                for (int j = 0; j < this->_N; j++)
+//                    std::cout << it[i][j] << ' ';
+//                std::cout << std::endl;
+//            }
+//            std::cout << std::endl;
+//        }
+//        std::cout << "History end\n";
+
+//        if (g == 23)
+//            exit(0);
+        std::cout << g << std::endl;
         g++;
     }
 }
