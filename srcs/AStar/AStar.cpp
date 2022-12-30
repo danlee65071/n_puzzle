@@ -88,6 +88,9 @@ AStar::AStar(int n, int** data, const std::string& heuristic): _N(n), _Data(data
         start_value++;
     }
     this->_History.insert(this->GetCopy(this->_Data));
+    this->_OriginalData = this->GetCopy(this->_Data);
+    this->_OriginalEmptyPos.x = this->_EmptyPos.x;
+    this->_OriginalEmptyPos.y = this->_EmptyPos.y;
 }
 
 int** AStar::GetCopy(int **Array)
@@ -231,9 +234,30 @@ int AStar::GetLinearConflicts(int** Array)
             for (int j = cur_row + 1; j < this->_N; j++) {
                 if (!Array[i][j] || !Array[i][cur_row])
                     continue;
+//                std::cout << "i: " << i << std::endl;
+//                std::cout << "cur_row: " << cur_row << std::endl;
+//                std::cout << "j: " << j << std::endl;
+//                std::cout << "Array[i][cur_row]: " << Array[i][cur_row] << std::endl;
+//                std::cout << "Array[i][j]: " << Array[i][j] << std::endl;
+//                std::cout << "this->_NumPos[Array[i][cur_row] - 1].y: " << this->_NumPos[Array[i][cur_row] - 1].y << std::endl;
+//                std::cout << "this->_NumPos[Array[i][j] - 1].y: " << this->_NumPos[Array[i][j] - 1].y << std::endl;
+//                std::cout << "this->_NumPos[Array[i][cur_row] - 1].x: " << this->_NumPos[Array[i][cur_row] - 1].x << std::endl;
+//                std::cout << "this->_NumPos[Array[i][j] - 1].x: " << this->_NumPos[Array[i][j] - 1].x << std::endl;
                 if (this->_NumPos[Array[i][cur_row] - 1].y == this->_NumPos[Array[i][j] - 1].y \
                     && this->_NumPos[Array[i][cur_row] - 1].y == i && this->_NumPos[Array[i][cur_row] - 1].x > this->_NumPos[Array[i][j] - 1].x)
+//              a = Array[i][cur_row]
+//              goal_a = this->_NumPos[Array[i][cur_row] - 1]
+//              b = Array[i][j]
+//              goal_b = this->_NumPos[Array[i][j] - 1]
+//                if (this->_NumPos[Array[i][cur_row] - 1].x == this->_NumPos[Array[i][j] - 1].x || this->_NumPos[Array[i][cur_row] - 1].x == this->_NumPos[Array[i][j] - 1].x \
+//                            || this->_NumPos[Array[i][cur_row] - 1].x >= j || this->_NumPos[Array[i][cur_row] - 1].x <= j \
+//                            || this->_NumPos[Array[i][cur_row] - 1].y >= i || this->_NumPos[Array[i][cur_row] - 1].y <= i \
+//                            || this->_NumPos[Array[i][j] - 1].x >= cur_row || this->_NumPos[Array[i][cur_row] - 1].x <= cur_row \
+//                            || this->_NumPos[Array[i][j] - 1].y >= i || this->_NumPos[Array[i][j] - 1].y <= i)
+                {
                     conflicts++;
+//                    std::cout << "conflicts: " << conflicts << std::endl;
+                }
             }
 
 //    checks columns
@@ -245,6 +269,11 @@ int AStar::GetLinearConflicts(int** Array)
                     continue;
                 if (this->_NumPos[Array[cur_col][j] - 1].x == this->_NumPos[Array[i][j] - 1].x \
                     && this->_NumPos[Array[cur_col][j] - 1].x == j && this->_NumPos[Array[cur_col][j] - 1].y > this->_NumPos[Array[i][j] - 1].y)
+//                if (this->_NumPos[Array[cur_col][j] - 1].x == this->_NumPos[Array[i][j] - 1].x || this->_NumPos[Array[cur_col][i] - 1].x == this->_NumPos[Array[i][j] - 1].x \
+//                            || this->_NumPos[Array[cur_col][j] - 1].x >= j || this->_NumPos[Array[cur_col][j] - 1].x <= j \
+//                            || this->_NumPos[Array[cur_col][j] - 1].y >= i || this->_NumPos[Array[cur_col][j] - 1].y <= i \
+//                            || this->_NumPos[Array[i][j] - 1].x >= j || this->_NumPos[Array[cur_col][j] - 1].x <= j \
+//                            || this->_NumPos[Array[i][j] - 1].y >= cur_col || this->_NumPos[Array[i][j] - 1].y <= cur_col)
                     conflicts++;
             }
     return conflicts;
@@ -264,6 +293,8 @@ int AStar::GetMatrixHeuristic(int **Array)
             res += this->_Heuristics(p, this->_NumPos[Array[i][j] - 1]);
         }
     }
+//    auto confilcts = AStar::GetLinearConflicts(Array);
+//    std::cout << "Linear conflicts: " << confilcts << std::endl;
     res += 2 * AStar::GetLinearConflicts(Array);
     return res;
 }
@@ -285,11 +316,10 @@ bool AStar::CheckExistMatrixInHistory(int **Array)
                 break;
         }
         if (flag) {
-            std::cout << "1\n";
+            std::cout << "exists!" << std::endl;
             return true;
         }
     }
-    std::cout << "0\n";
     return false;
 }
 
@@ -300,6 +330,7 @@ void AStar::RunAlgo()
     int** cpy3 = new int*[this->_N]; // right 2
     int** cpy4 = new int*[this->_N]; // left 3
     int prev;
+    bool is_inf;
 
     prev = -1;
 
@@ -318,6 +349,7 @@ void AStar::RunAlgo()
             std::cout << this->_Data[i][j] << ' ';
         std::cout << std::endl;
     }
+//    test = false;
     while (!this->CheckData())
     {
         bool is_cpy1 = this->CopyData(&cpy1, 0);
@@ -328,7 +360,8 @@ void AStar::RunAlgo()
         int f[4];
 
         f[0] = f[1] = f[2] = f[3] = std::numeric_limits<int>::max();
-        std::cout << is_cpy1 << ' ' << is_cpy2 << ' ' << is_cpy3 << ' ' << is_cpy4 << std::endl;
+        std::cout << std::endl << is_cpy1 << ' ' << is_cpy2 << ' ' << is_cpy3 << ' ' << is_cpy4 << std::endl;
+        std::cout << "prev: " << prev << std::endl;
         if (is_cpy1 && prev != 1 && !this->CheckExistMatrixInHistory(cpy1))
             f[0] = g + this->GetMatrixHeuristic(cpy1);
         if (is_cpy2 && prev != 0 && !this->CheckExistMatrixInHistory(cpy2))
@@ -338,12 +371,29 @@ void AStar::RunAlgo()
         if (is_cpy4 && prev != 2 && !this->CheckExistMatrixInHistory(cpy4))
             f[3] = g + this->GetMatrixHeuristic(cpy4);
 
+        is_inf = true;
         int min_val = f[0];
         int min_id = 0;
-        for (int i = 1; i < 4; i++) {
-            if (f[i] < min_val) {
-                min_val = f[i];
-                min_id = i;
+
+        for (int k = 1; k < 4; k++)
+        {
+            if (f[k] != f[k-1])
+                is_inf = false;
+        }
+        if (is_inf && f[0] == std::numeric_limits<int>::max())
+        {
+            std::random_device dev;
+            std::mt19937 rng(dev());
+            std::uniform_int_distribution<std::mt19937::result_type> dist(0,3);
+            min_id = static_cast<int>(dist(rng));
+        }
+        else
+        {
+            for (int i = 1; i < 4; i++) {
+                if (f[i] < min_val) {
+                    min_val = f[i];
+                    min_id = i;
+                }
             }
         }
 
@@ -351,50 +401,93 @@ void AStar::RunAlgo()
             std::cout << i << ' ';
         std::cout << std::endl;
 
+//        if (test)
+//        {
+//            std::cout << "cpy1" << std::endl;
+//            for (int i = 0; i < this->_N; i++)
+//            {
+//                for (int j = 0; j < this->_N; j++)
+//                    std::cout << cpy1[i][j] << ' ';
+//                std::cout << std::endl;
+//            }
+//
+//            std::cout << "cpy2" << std::endl;
+//            for (int i = 0; i < this->_N; i++)
+//            {
+//                for (int j = 0; j < this->_N; j++)
+//                    std::cout << cpy2[i][j] << ' ';
+//                std::cout << std::endl;
+//            }
+//
+//            std::cout << "cpy3" << std::endl;
+//            for (int i = 0; i < this->_N; i++)
+//            {
+//                for (int j = 0; j < this->_N; j++)
+//                    std::cout << cpy3[i][j] << ' ';
+//                std::cout << std::endl;
+//            }
+//
+//            std::cout << "cpy4" << std::endl;
+//            for (int i = 0; i < this->_N; i++)
+//            {
+//                for (int j = 0; j < this->_N; j++)
+//                    std::cout << cpy4[i][j] << ' ';
+//                std::cout << std::endl;
+//            }
+//
+////            exit(0);
+//        }
+
         switch (min_id) {
             case 0: {
-//                this->_History.insert(cpy1);
-                for (int i = 0; i < this->_N; i++)
-                    for (int j = 0; j < this->_N; j++)
-                        this->_Data[i][j] = cpy1[i][j];
-                this->_EmptyPos.y--;
-                prev = 0;
-                std::cout << "up" << std::endl;
-                break;
+                if (is_cpy1)
+                {
+                    for (int i = 0; i < this->_N; i++)
+                        for (int j = 0; j < this->_N; j++)
+                            this->_Data[i][j] = cpy1[i][j];
+                    this->_EmptyPos.y--;
+                    prev = 0;
+                    std::cout << "up" << std::endl;
+                    break;
+                }
             }
             case 1: {
-//                this->_History.insert(cpy2);
-                for (int i = 0; i < this->_N; i++)
-                    for (int j = 0; j < this->_N; j++)
-                        this->_Data[i][j] = cpy2[i][j];
-                (this->_EmptyPos.y)++;
-                prev = 1;
-                std::cout << "down" << std::endl;
-                break;
+                if (is_cpy2) {
+                    for (int i = 0; i < this->_N; i++)
+                        for (int j = 0; j < this->_N; j++)
+                            this->_Data[i][j] = cpy2[i][j];
+                    (this->_EmptyPos.y)++;
+                    prev = 1;
+                    std::cout << "down" << std::endl;
+                    break;
+                }
             }
             case 2: {
-//                this->_History.insert(cpy3);
-                for (int i = 0; i < this->_N; i++)
-                    for (int j = 0; j < this->_N; j++)
-                        this->_Data[i][j] = cpy3[i][j];
-                (this->_EmptyPos.x)++;
-                prev = 2;
-                std::cout << "right" << std::endl;
-                break;
+                if (is_cpy3) {
+                    for (int i = 0; i < this->_N; i++)
+                        for (int j = 0; j < this->_N; j++)
+                            this->_Data[i][j] = cpy3[i][j];
+                    (this->_EmptyPos.x)++;
+                    prev = 2;
+                    std::cout << "right" << std::endl;
+                    break;
+                }
             }
             case 3: {
-//                this->_History.insert(cpy4);
-                for (int i = 0; i < this->_N; i++)
-                    for (int j = 0; j < this->_N; j++)
-                        this->_Data[i][j] = cpy4[i][j];
-                (this->_EmptyPos.x)--;
-                prev = 3;
-                std::cout << "left" << std::endl;
-                break;
+                if (is_cpy4) {
+                    for (int i = 0; i < this->_N; i++)
+                        for (int j = 0; j < this->_N; j++)
+                            this->_Data[i][j] = cpy4[i][j];
+                    (this->_EmptyPos.x)--;
+                    prev = 3;
+                    std::cout << "left" << std::endl;
+                    break;
+                }
             }
         }
 
         this->_History.insert(this->GetCopy(this->_Data));
+
 
         std::cout << std::endl;
         for (int i = 0; i < this->_N; i++)
@@ -403,6 +496,25 @@ void AStar::RunAlgo()
                 std::cout << this->_Data[i][j] << ' ';
             std::cout << std::endl;
         }
+
+//        is_inf = true;
+//        for (int k = 1; k < 4; k++)
+//        {
+//            if (f[k] != f[k-1])
+//                is_inf = false;
+//        }
+//        if (is_inf && f[0] == std::numeric_limits<int>::max())
+//        {
+//            for (int i = 0; i < this->_N; i++)
+//            {
+//                for (int j = 0; j < this->_N; j++)
+//                    this->_Data[i][j] = this->_OriginalData[i][j];
+//            }
+//            this->_EmptyPos.x = this->_OriginalEmptyPos.x;
+//            this->_EmptyPos.y = this->_OriginalEmptyPos.y;
+//            prev = -1;
+//            test = true;
+//        }
 
 //        std::cout << "\nHistory start\n";
 //        for (auto it : this->_History)
@@ -417,8 +529,7 @@ void AStar::RunAlgo()
 //        }
 //        std::cout << "History end\n";
 
-//        if (g == 23)
-//            exit(0);
+
         std::cout << g << std::endl;
         g++;
     }

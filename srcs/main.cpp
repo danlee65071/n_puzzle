@@ -4,7 +4,7 @@
 
 int main()
 {
-    Parser p1("maps/3.txt");
+    Parser p1("maps/9.txt");
 
     AStar& a = AStar::GetInstance(p1.getN(), p1.getData());
 //    std::cout << a.CheckData() << std::endl;

@@ -6,6 +6,7 @@
 #include <limits>
 #include <cstring>
 #include <set>
+#include <random>
 #include "Point.hpp"
 #include "cmath"
 
@@ -18,6 +19,8 @@ class AStar
         Point _EmptyPos = {-1, -1, 0};
         Point* _NumPos;
         std::set<int**> _History;
+        int** _OriginalData;
+        Point _OriginalEmptyPos;
 
     // Singleton design
     private:
