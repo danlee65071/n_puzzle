@@ -15,7 +15,7 @@ class AStar
     private:
         int _N;
         int** _Data;
-        int (*_Heuristics)(Point p1, Point p2);
+        float (*_Heuristics)(Point p1, Point p2);
         Point _EmptyPos = {-1, -1, 0};
         Point* _NumPos;
         std::set<int**> _History;
@@ -39,17 +39,20 @@ class AStar
 
     // Metrics
     public:
-        static int ManhattanMetric(Point p, Point goal);
+        static float ManhattanMetric(Point p, Point goal);
+        static float EuclidianMetric(Point p, Point goal);
 
     // Algorithm
     public:
+        bool CheckBoard();
         bool CheckData() const;
         void RunAlgo();
-        void ShiftData();
+        int GetInversionsCount(const int* Array) const;
         bool CopyData(int*** Array, int swap_id, bool is_done=true);
-        int GetMatrixHeuristic(int** Array);
+        float GetMatrixHeuristic(int** Array);
         int GetLinearConflicts(int** Array);
         int** GetCopy(int** Array);
         bool CheckExistMatrixInHistory(int** Array);
+        int FindEpmtyPos();
 };
 

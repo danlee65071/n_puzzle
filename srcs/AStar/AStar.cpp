@@ -3,6 +3,11 @@
 
 AStar::AStar(int n, int** data, const std::string& heuristic): _N(n), _Data(data)
 {
+    if (!this->CheckBoard())
+    {
+        std::cout << "The puzzle is unsolvable" << std::endl;
+        exit(0);
+    }
     if (heuristic == "manhattan")
         this->_Heuristics = &AStar::ManhattanMetric;
     bool is_break = false;
@@ -87,6 +92,7 @@ AStar::AStar(int n, int** data, const std::string& heuristic): _N(n), _Data(data
         k++;
         start_value++;
     }
+
     this->_History.insert(this->GetCopy(this->_Data));
     this->_OriginalData = this->GetCopy(this->_Data);
     this->_OriginalEmptyPos.x = this->_EmptyPos.x;
@@ -105,9 +111,114 @@ int** AStar::GetCopy(int **Array)
     return cpy;
 }
 
-int AStar::ManhattanMetric(Point p, Point goal)
+float AStar::ManhattanMetric(Point p, Point goal)
 {
     return abs(p.x - goal.x) + abs(p.y - goal.y);
+}
+
+float AStar::EuclidianMetric(Point p, Point goal)
+{
+    return sqrt(pow(p.x - goal.x, 2) - pow(p.y - goal.y, 2));
+}
+
+int AStar::GetInversionsCount(const int *Array) const
+{
+    int inv_count = 0;
+    for (int i = 0; i < this->_N * this->_N - 1; i++)
+        for (int j = i+1; j < this->_N * this->_N; j++)
+            if (Array[j] && Array[i] &&  Array[i] > Array[j])
+                inv_count++;
+    return inv_count;
+}
+
+int AStar::FindEpmtyPos()
+{
+    for (int i = this->_N - 1; i >= 0; i--)
+        for (int j = this->_N - 1; j >= 0; j--)
+            if (this->_Data[i][j] == 0)
+                return this->_N - i;
+    return 0;
+}
+
+bool AStar::CheckBoard()
+{
+    int* LineData = new int[this->_N * this->_N - 1];
+    int i, j, k;
+    int i_max, j_max;
+    int i_min, j_min;
+    bool is_vertical = true;
+    bool is_reverse = false;
+    int start_value = 0;
+
+    i = j = k = 0;
+    i_max = j_max = this->_N - 1;
+    i_min = j_min = 0;
+    while (start_value < this->_N * this->_N - 1)
+    {
+        if (this->_Data[i][j])
+            LineData[k++] = this->_Data[i][j];
+        if (is_vertical && !is_reverse)
+        {
+            if (j < j_max)
+                j++;
+            else
+            {
+                i++;
+                i_min++;
+                is_vertical = false;
+            }
+        }
+        else if (!is_vertical && !is_reverse)
+        {
+            if (i < i_max)
+                i++;
+            else
+            {
+                j--;
+                j_max--;
+                is_vertical = true;
+                is_reverse = true;
+            }
+        }
+        else if (is_vertical)
+        {
+            if (j > j_min)
+                j--;
+            else
+            {
+                i--;
+                i_max--;
+                is_vertical = false;
+            }
+        }
+        else {
+            if (i > i_min)
+                i--;
+            else {
+                j++;
+                j_min++;
+                is_vertical = true;
+                is_reverse = false;
+            }
+        }
+        start_value++;
+    }
+
+    int InversionsCount = this->GetInversionsCount(LineData);
+    if (this->_N % 2 != 0)
+    {
+        if (InversionsCount % 2 != 0)
+            return false;
+    }
+    else
+    {
+        int pos = this->FindEpmtyPos();
+        if (pos & 1)
+            return !(InversionsCount & 1);
+        else
+            return InversionsCount & 1;
+    }
+    return true;
 }
 
 bool AStar::CheckData() const
@@ -234,30 +345,9 @@ int AStar::GetLinearConflicts(int** Array)
             for (int j = cur_row + 1; j < this->_N; j++) {
                 if (!Array[i][j] || !Array[i][cur_row])
                     continue;
-//                std::cout << "i: " << i << std::endl;
-//                std::cout << "cur_row: " << cur_row << std::endl;
-//                std::cout << "j: " << j << std::endl;
-//                std::cout << "Array[i][cur_row]: " << Array[i][cur_row] << std::endl;
-//                std::cout << "Array[i][j]: " << Array[i][j] << std::endl;
-//                std::cout << "this->_NumPos[Array[i][cur_row] - 1].y: " << this->_NumPos[Array[i][cur_row] - 1].y << std::endl;
-//                std::cout << "this->_NumPos[Array[i][j] - 1].y: " << this->_NumPos[Array[i][j] - 1].y << std::endl;
-//                std::cout << "this->_NumPos[Array[i][cur_row] - 1].x: " << this->_NumPos[Array[i][cur_row] - 1].x << std::endl;
-//                std::cout << "this->_NumPos[Array[i][j] - 1].x: " << this->_NumPos[Array[i][j] - 1].x << std::endl;
                 if (this->_NumPos[Array[i][cur_row] - 1].y == this->_NumPos[Array[i][j] - 1].y \
                     && this->_NumPos[Array[i][cur_row] - 1].y == i && this->_NumPos[Array[i][cur_row] - 1].x > this->_NumPos[Array[i][j] - 1].x)
-//              a = Array[i][cur_row]
-//              goal_a = this->_NumPos[Array[i][cur_row] - 1]
-//              b = Array[i][j]
-//              goal_b = this->_NumPos[Array[i][j] - 1]
-//                if (this->_NumPos[Array[i][cur_row] - 1].x == this->_NumPos[Array[i][j] - 1].x || this->_NumPos[Array[i][cur_row] - 1].x == this->_NumPos[Array[i][j] - 1].x \
-//                            || this->_NumPos[Array[i][cur_row] - 1].x >= j || this->_NumPos[Array[i][cur_row] - 1].x <= j \
-//                            || this->_NumPos[Array[i][cur_row] - 1].y >= i || this->_NumPos[Array[i][cur_row] - 1].y <= i \
-//                            || this->_NumPos[Array[i][j] - 1].x >= cur_row || this->_NumPos[Array[i][cur_row] - 1].x <= cur_row \
-//                            || this->_NumPos[Array[i][j] - 1].y >= i || this->_NumPos[Array[i][j] - 1].y <= i)
-                {
                     conflicts++;
-//                    std::cout << "conflicts: " << conflicts << std::endl;
-                }
             }
 
 //    checks columns
@@ -269,19 +359,14 @@ int AStar::GetLinearConflicts(int** Array)
                     continue;
                 if (this->_NumPos[Array[cur_col][j] - 1].x == this->_NumPos[Array[i][j] - 1].x \
                     && this->_NumPos[Array[cur_col][j] - 1].x == j && this->_NumPos[Array[cur_col][j] - 1].y > this->_NumPos[Array[i][j] - 1].y)
-//                if (this->_NumPos[Array[cur_col][j] - 1].x == this->_NumPos[Array[i][j] - 1].x || this->_NumPos[Array[cur_col][i] - 1].x == this->_NumPos[Array[i][j] - 1].x \
-//                            || this->_NumPos[Array[cur_col][j] - 1].x >= j || this->_NumPos[Array[cur_col][j] - 1].x <= j \
-//                            || this->_NumPos[Array[cur_col][j] - 1].y >= i || this->_NumPos[Array[cur_col][j] - 1].y <= i \
-//                            || this->_NumPos[Array[i][j] - 1].x >= j || this->_NumPos[Array[cur_col][j] - 1].x <= j \
-//                            || this->_NumPos[Array[i][j] - 1].y >= cur_col || this->_NumPos[Array[i][j] - 1].y <= cur_col)
                     conflicts++;
             }
     return conflicts;
 }
 
-int AStar::GetMatrixHeuristic(int **Array)
+float AStar::GetMatrixHeuristic(int **Array)
 {
-    int res = 0;
+    float res = 0;
 
     for (int i = 0; i < this->_N; i++)
     {
@@ -293,9 +378,7 @@ int AStar::GetMatrixHeuristic(int **Array)
             res += this->_Heuristics(p, this->_NumPos[Array[i][j] - 1]);
         }
     }
-//    auto confilcts = AStar::GetLinearConflicts(Array);
-//    std::cout << "Linear conflicts: " << confilcts << std::endl;
-    res += 2 * AStar::GetLinearConflicts(Array);
+    res += static_cast<float>(2 * AStar::GetLinearConflicts(Array));
     return res;
 }
 
@@ -306,7 +389,6 @@ bool AStar::CheckExistMatrixInHistory(int **Array)
         flag = true;
         for (int i = 0; i < this->_N; i++) {
             for (int j = 0; j < this->_N; j++) {
-//                std::cout << it[i][j] << ' ' << Array[i][j] << std::endl;
                 if (it[i][j] != Array[i][j]) {
                     flag = false;
                     break;
@@ -349,7 +431,6 @@ void AStar::RunAlgo()
             std::cout << this->_Data[i][j] << ' ';
         std::cout << std::endl;
     }
-//    test = false;
     while (!this->CheckData())
     {
         bool is_cpy1 = this->CopyData(&cpy1, 0);
@@ -357,22 +438,20 @@ void AStar::RunAlgo()
         bool is_cpy3 = this->CopyData(&cpy3, 2);
         bool is_cpy4 = this->CopyData(&cpy4, 3);
 
-        int f[4];
+        float f[4];
 
-        f[0] = f[1] = f[2] = f[3] = std::numeric_limits<int>::max();
-        std::cout << std::endl << is_cpy1 << ' ' << is_cpy2 << ' ' << is_cpy3 << ' ' << is_cpy4 << std::endl;
-        std::cout << "prev: " << prev << std::endl;
+        f[0] = f[1] = f[2] = f[3] = std::numeric_limits<float>::max();
         if (is_cpy1 && prev != 1 && !this->CheckExistMatrixInHistory(cpy1))
-            f[0] = g + this->GetMatrixHeuristic(cpy1);
+            f[0] = static_cast<float>(g + this->GetMatrixHeuristic(cpy1));
         if (is_cpy2 && prev != 0 && !this->CheckExistMatrixInHistory(cpy2))
-            f[1] = g + this->GetMatrixHeuristic(cpy2);
+            f[1] = static_cast<float>(g + this->GetMatrixHeuristic(cpy2));
         if (is_cpy3 && prev != 3 && !this->CheckExistMatrixInHistory(cpy3))
-            f[2] = g + this->GetMatrixHeuristic(cpy3);
+            f[2] = static_cast<float>(g + this->GetMatrixHeuristic(cpy3));
         if (is_cpy4 && prev != 2 && !this->CheckExistMatrixInHistory(cpy4))
-            f[3] = g + this->GetMatrixHeuristic(cpy4);
+            f[3] = static_cast<float>(g + this->GetMatrixHeuristic(cpy4));
 
         is_inf = true;
-        int min_val = f[0];
+        float min_val = f[0];
         int min_id = 0;
 
         for (int k = 1; k < 4; k++)
@@ -380,7 +459,7 @@ void AStar::RunAlgo()
             if (f[k] != f[k-1])
                 is_inf = false;
         }
-        if (is_inf && f[0] == std::numeric_limits<int>::max())
+        if (is_inf && f[0] == std::numeric_limits<float>::max())
         {
             std::random_device dev;
             std::mt19937 rng(dev());
@@ -396,47 +475,6 @@ void AStar::RunAlgo()
                 }
             }
         }
-
-        for (int i : f)
-            std::cout << i << ' ';
-        std::cout << std::endl;
-
-//        if (test)
-//        {
-//            std::cout << "cpy1" << std::endl;
-//            for (int i = 0; i < this->_N; i++)
-//            {
-//                for (int j = 0; j < this->_N; j++)
-//                    std::cout << cpy1[i][j] << ' ';
-//                std::cout << std::endl;
-//            }
-//
-//            std::cout << "cpy2" << std::endl;
-//            for (int i = 0; i < this->_N; i++)
-//            {
-//                for (int j = 0; j < this->_N; j++)
-//                    std::cout << cpy2[i][j] << ' ';
-//                std::cout << std::endl;
-//            }
-//
-//            std::cout << "cpy3" << std::endl;
-//            for (int i = 0; i < this->_N; i++)
-//            {
-//                for (int j = 0; j < this->_N; j++)
-//                    std::cout << cpy3[i][j] << ' ';
-//                std::cout << std::endl;
-//            }
-//
-//            std::cout << "cpy4" << std::endl;
-//            for (int i = 0; i < this->_N; i++)
-//            {
-//                for (int j = 0; j < this->_N; j++)
-//                    std::cout << cpy4[i][j] << ' ';
-//                std::cout << std::endl;
-//            }
-//
-////            exit(0);
-//        }
 
         switch (min_id) {
             case 0: {
@@ -496,41 +534,6 @@ void AStar::RunAlgo()
                 std::cout << this->_Data[i][j] << ' ';
             std::cout << std::endl;
         }
-
-//        is_inf = true;
-//        for (int k = 1; k < 4; k++)
-//        {
-//            if (f[k] != f[k-1])
-//                is_inf = false;
-//        }
-//        if (is_inf && f[0] == std::numeric_limits<int>::max())
-//        {
-//            for (int i = 0; i < this->_N; i++)
-//            {
-//                for (int j = 0; j < this->_N; j++)
-//                    this->_Data[i][j] = this->_OriginalData[i][j];
-//            }
-//            this->_EmptyPos.x = this->_OriginalEmptyPos.x;
-//            this->_EmptyPos.y = this->_OriginalEmptyPos.y;
-//            prev = -1;
-//            test = true;
-//        }
-
-//        std::cout << "\nHistory start\n";
-//        for (auto it : this->_History)
-//        {
-//            for (int i = 0; i < this->_N; i++)
-//            {
-//                for (int j = 0; j < this->_N; j++)
-//                    std::cout << it[i][j] << ' ';
-//                std::cout << std::endl;
-//            }
-//            std::cout << std::endl;
-//        }
-//        std::cout << "History end\n";
-
-
-        std::cout << g << std::endl;
         g++;
     }
 }
