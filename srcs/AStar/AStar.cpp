@@ -536,4 +536,5 @@ void AStar::RunAlgo()
         }
         g++;
     }
+    exit(0);
 }
